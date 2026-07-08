@@ -39,10 +39,16 @@ const userRouter = require('./routes/user'); //importing the user routes
 
 //using the routes
 
-app.use('/', authRouter); 
-app.use('/', requestRouter); 
-app.use('/', profileRouter);
-app.use('/', userRouter);
+// app.use('/', authRouter); 
+// app.use('/', requestRouter); 
+// app.use('/', profileRouter);
+// app.use('/', userRouter);
+
+
+app.use("/api", authRouter);
+app.use("/api", requestRouter);
+app.use("/api", profileRouter);
+app.use("/api", userRouter);
 
     
 connectDB().then(() => {
