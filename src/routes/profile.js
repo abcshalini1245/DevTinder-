@@ -8,7 +8,7 @@ const validator = require('validator'); //importing the validator library to val
 const bcrypt = require('bcrypt'); //importing the bcrypt library to hash the password
 
 const crypto = require("crypto"); //importing the crypto library to generate a random token for password reset
-const sendOTP = require("../utils/sendEmail");
+const {sendOTP} = require("../utils/sendEmail");
 
 
 const upload = require("../middlewares/upload");
@@ -57,6 +57,28 @@ ProfileRouter.get("/profile/view", userAuth, async (req, res) => {
 });
 
 
+
+ProfileRouter.get("/profile/:userId", userAuth, async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findById(userId).select(
+      "firstName lastName photourl about"
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+});
 
 ProfileRouter.patch("/profile/edit", userAuth, async (req, res) => {
     try{

@@ -2,29 +2,40 @@
 require("dotenv").config();
 const express = require('express');
 const cors = require('cors');
-
-
-const connectDB = require('./config/database'); //importing the database connection   
+const chatRouter = require("./src/routes/chat");
+  
 
 const app = express(); //instance of express js applcation
 
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://3.26.8.106",
+];
 
-app.use(cors({
-    origin: process.env.FRONTEND_URL, //whitelisting origin domain name
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
-})); //used as a middleware
+  })
+);
 
-const User = require('./models/user'); //importing the user model
+// const User = require('./models/user'); //importing the user modelnodemon server.js
 
 app.use(express.json()); //middleware to parse incoming JSON requests  
-const { validateSignUpData } = require('./utils/validation'); //importing the validation function 
-const bcrypt = require('bcrypt'); //importing the bcrypt library to hash the password
-const JWT = require('jsonwebtoken'); //importing the jsonwebtoken library to create a token
-const secretKey = "mysecretkey"; //secret   key to sign the token
+// const { validateSignUpData } = require('./utils/validation'); //importing the validation function 
+// const bcrypt = require('bcrypt'); //importing the bcrypt library to hash the password
+// const JWT = require('jsonwebtoken'); //importing the jsonwebtoken library to create a token
+// const secretKey = "mysecretkey"; //secret   key to sign the token
 const cookieParser = require('cookie-parser'); //importing the cookie-parser library to parse the cookies
 app.use(cookieParser()); //middleware to parse the cookies
-const userAuth = require('./middlewares/auth'); //importing the user authentication middleware  
+// const userAuth = require('./middlewares/auth'); //importing the user authentication middleware  
 
 
 
@@ -32,10 +43,10 @@ const userAuth = require('./middlewares/auth'); //importing the user authenticat
 
 //importing the routes
 
-const authRouter = require('./routes/auth'); //importing the auth routes
-const requestRouter = require('./routes/request');  
-const profileRouter = require('./routes/profile'); //importing the profile routes
-const userRouter = require('./routes/user'); //importing the user routes
+const authRouter = require('./src/routes/auth'); //importing the auth routes
+const requestRouter = require('./src/routes/request');  
+const profileRouter = require('./src/routes/profile'); //importing the profile routes
+const userRouter = require('./src/routes/user'); //importing the user routes
 
 //using the routes
 
@@ -49,19 +60,10 @@ app.use("/api", authRouter);
 app.use("/api", requestRouter);
 app.use("/api", profileRouter);
 app.use("/api", userRouter);
-
-    
-connectDB().then(() => {
-    console.log("Connected to MongoDB");
-    app.listen(7777,()=>{
-    console.log("server is running on port 7777");
-});
-})
-.catch((err) => {
-    console.error("Error connecting to MongoDB:", err);
-});
+app.use("/api", chatRouter);
 
 
+module.exports = app;
 
 
 

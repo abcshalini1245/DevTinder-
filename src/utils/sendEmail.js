@@ -1,3 +1,4 @@
+
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
@@ -10,18 +11,35 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const sendOTP = async (email, otp) => {
+// Generic email function
+const sendEmail = async ({ to, subject, html }) => {
   await transporter.sendMail({
-   from: '"DevTinder" <abcshalini1245@gmail.com>',
-    to: email,
-    subject: "Password Reset OTP",
-    html: `
-      <h2>DevTinder Password Reset</h2>
+    from: '"DevNexus" <abcshalini1245@gmail.com>',
+    to,
+    subject,
+    html,
+  });
+
+  console.log(`Email sent to ${to}`);
+};
+
+// OTP email
+const sendOTP = async (email, otp) => {
+  const html = `
+      <h2>DevNexus Password Reset</h2>
       <p>Your OTP is:</p>
       <h1>${otp}</h1>
       <p>This OTP expires in 10 minutes.</p>
-    `,
+  `;
+
+  await sendEmail({
+    to: email,
+    subject: "Password Reset OTP",
+    html,
   });
 };
 
-module.exports = sendOTP;
+module.exports = {
+  sendEmail,
+  sendOTP,
+};
